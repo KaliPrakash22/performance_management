@@ -1,0 +1,54 @@
+-- Campaigns table
+CREATE TABLE IF NOT EXISTS campaigns (
+    campaign_id SERIAL PRIMARY KEY,
+    campaign_name VARCHAR(255) NOT NULL,
+    budget DECIMAL(10, 2),
+    start_date DATE,
+    end_date DATE,
+    description TEXT
+);
+
+-- Marketing channels for each campaign (e.g., Email, Social Media)
+CREATE TABLE IF NOT EXISTS channels (
+    channel_id SERIAL PRIMARY KEY,
+    campaign_id INTEGER REFERENCES campaigns(campaign_id) ON DELETE CASCADE,
+    channel_name VARCHAR(255) NOT NULL,
+    UNIQUE (campaign_id, channel_name)
+);
+insert into channels(campaign_id,channel_name)values(1,'channel1');
+
+-- Customers database
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    region VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    last_purchase_date DATE
+);
+select * from customers;
+insert into customers(name,email,region,is_active) VALUES ('MADHAVI','abc@xyz.com','mumbai','true');
+-- Customer Segments table
+CREATE TABLE IF NOT EXISTS segments (
+    segment_id SERIAL PRIMARY KEY,
+    segment_name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT
+);
+
+-- Junction table to link customers to segments (many-to-many relationship)
+CREATE TABLE IF NOT EXISTS customer_segments (
+    customer_id INTEGER REFERENCES customers(customer_id) ON DELETE CASCADE,
+    segment_id INTEGER REFERENCES segments(segment_id) ON DELETE CASCADE,
+    PRIMARY KEY (customer_id, segment_id)
+);
+
+-- Performance tracking for each campaign and channel
+CREATE TABLE IF NOT EXISTS campaign_performance (
+    performance_id SERIAL PRIMARY KEY,
+    campaign_id INTEGER REFERENCES campaigns(campaign_id) ON DELETE CASCADE,
+    channel_id INTEGER REFERENCES channels(channel_id) ON DELETE CASCADE,
+    emails_sent INTEGER,
+    emails_opened INTEGER,
+    clicks INTEGER,
+    timestamp TIMESTAMPTZ DEFAULT NOW()
+);
