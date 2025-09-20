@@ -102,7 +102,6 @@ def get_employee_goals(employee_id: int):
     WHERE g.employee_id = %s
     ORDER BY g.due_date;
     """
-    # Fix: Convert the numpy.int64 to a standard Python int
     df = pd.read_sql_query(query, conn, params=(int(employee_id),))
     conn.close()
     return df
@@ -127,6 +126,16 @@ def get_manager_goals(manager_id: int):
     ORDER BY g.due_date;
     """
     df = pd.read_sql_query(query, conn, params=(int(manager_id),))
+    conn.close()
+    return df
+
+# NEW ANALYTICS FUNCTION
+def get_all_goals():
+    """Retrieves all goals from the database."""
+    conn = get_db_connection()
+    if not conn: return pd.DataFrame()
+    query = "SELECT * FROM goals;"
+    df = pd.read_sql_query(query, conn)
     conn.close()
     return df
 
@@ -190,6 +199,16 @@ def update_task_status(task_id: int, status: str):
         return False
     finally:
         if conn: cur.close(); conn.close()
+
+# NEW ANALYTICS FUNCTION
+def get_all_tasks():
+    """Retrieves all tasks from the database."""
+    conn = get_db_connection()
+    if not conn: return pd.DataFrame()
+    query = "SELECT * FROM tasks;"
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df
 
 # Feedback
 def create_feedback(goal_id: int, manager_id: int, feedback_text: str):
